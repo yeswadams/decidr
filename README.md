@@ -1,13 +1,6 @@
 # Decidr
 
 > **Remember why. Learn what worked. Decide better.**
-
-Decidr is an open-source **decision journal** and **decision intelligence platform** built for high-velocity software engineering, product, and leadership teams. 
-
-Teams make hundreds of critical decisions every year—architectural choices, vendor selections, product pivots, and strategic trade-offs—but rarely capture the full context behind them. When circumstances change or outcomes falter, teams often forget *why* a decision was originally made, what assumptions influenced it, or what alternatives were considered.
-
-Decidr bridges this context gap by transforming transient discussions into persistent, searchable, and actionable **organizational memory**.
-
 ---
 
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
@@ -18,278 +11,767 @@ Decidr bridges this context gap by transforming transient discussions into persi
 
 ---
 
+Decidr is an open-source **decision journal** and **decision intelligence platform** built for high-velocity software engineering, product, and leadership teams. 
+
+Teams make important decisions every day, but the context behind those decisions is often scattered across Slack messages, meetings, documents, tickets, and people's memory. Decidr brings that context into one place.
+
+Capture a decision, document the assumptions behind it, record what you expected to happen, revisit the outcome, and use AI to uncover blind spots and patterns in how decisions are made.
+
+**The goal is simple: turn decisions into organizational memory.**
+
+---
+
 ## Table of Contents
 
-- [Why Decidr?](#-why-decidr)
-- [Key Features](#-key-features)
-- [System Architecture](#-system-architecture)
-- [Tech Stack](#-tech-stack)
-- [Quick Start \& Self-Hosting](#-quick-start--self-hosting)
-- [Configuration \& BYO-AI](#-configuration--byo-ai)
-- [Development Setup](#-development-setup)
-- [Project Roadmap](#-project-roadmap)
-- [Contributing](#-contributing)
-- [License](#-license)
+- [Why Decidr](#why-decidr)
+- [The Decision Context Gap](#the-decision-context-gap)
+- [Core Workflow](#core-workflow)
+- [Features](#features)
+- [Architecture](#architecture)
+- [Technology Stack](#technology-stack)
+- [Project Structure](#project-structure)
+- [Feature Isolation](#feature-isolation)
+- [Database Architecture](#database-architecture)
+- [PostgreSQL Anywhere](#postgresql-anywhere)
+- [Local Database Development](#local-database-development)
+- [Authentication and Authorization](#authentication-and-authorization)
+- [AI Architecture](#ai-architecture)
+- [Environment Variables](#environment-variables)
+- [Getting Started](#getting-started)
+- [Development Workflow](#development-workflow)
+- [Testing](#testing)
+- [Contributing](#contributing)
+- [Reporting Bugs](#reporting-bugs)
+- [Security](#security)
+- [Roadmap](#roadmap)
+- [Self-Hosting](#self-hosting)
+- [Design Philosophy](#design-philosophy)
+- [Decision Framework](#decision-framework)
+- [Project Status](#project-status)
+- [License](#license)
 
 ---
 
-## Why Decidr?
+## Why Decidr
 
-Most modern software tools help teams track **what** happened (Jira tickets, Git commits, Slack logs, Notion pages). 
+A decision without context becomes difficult to evaluate later.
 
-**Decidr helps teams remember *why*.**
+Imagine a product team deciding to launch a free tier. At the time, they believed:
+
+- Free users would increase product adoption.
+- Conversion to paid plans would remain healthy.
+- Support costs would remain manageable.
+
+Six months later, adoption has increased, but conversion has fallen and support costs have doubled.
+
+Without the original context, the team can only look at the result. With Decidr, the team can ask:
+
+> **What did we believe when we made this decision?**
+
+And then:
+
+> **Which assumptions were right, which were wrong, and what can we learn from this?**
+
+That feedback loop is the foundation of Decidr.
+
+---
+
+## The Decision Context Gap
+
+Teams are good at recording **what** happened. They're much worse at preserving **why**.
+
+| Today | With Decidr |
+|---|---|
+| Decisions buried across Slack, meetings, and documents | One searchable decision timeline |
+| Assumptions live in people's heads | Assumptions captured alongside each decision |
+| Decisions are rarely revisited | Scheduled prompts for structured retrospectives |
+| Teams repeat mistakes without seeing the pattern | AI surfaces blind spots and recurring patterns |
+| Decision history lives inside closed platforms | Open source, self-hosted, and under your control |
+
+> **Capture the context. Track the outcome. Learn what works.**
+
+---
+
+## Core Workflow
+
+Decidr follows a simple decision lifecycle:
 
 ```
-┌────────────────────────────────────────────────────────────────────────┐
-│                        THE DECISION CONTEXT GAP                        │
-├───────────────────────────────────┬────────────────────────────────────┤
-│ Traditional Documentation          │ Decidr Decision Intelligence       │
-├───────────────────────────────────┼────────────────────────────────────┤
-│ ❌ Decisions hidden in Slack threads │ ✅ Centralized decision timeline   │
-│ ❌ Unstated or forgotten assumptions│ ✅ Explicit assumption tracking    │
-│ ❌ No follow-up on actual outcomes │ ✅ Scheduled retrospective triggers│
-│ ❌ Repeat mistakes across teams   │ ✅ AI blind-spot & pattern analysis│
-│ ❌ Locked in proprietary SaaS     │ ✅ 100% Open Source & Self-Hosted  │
-└───────────────────────────────────┴────────────────────────────────────┘
+Context → Problem → Alternatives → Assumptions → Decision
+  → Expected Outcome → Review → Actual Outcome → Retrospective → Learning
+```
+
+The important part is the final step. Decidr is not just a place to store decisions — it is designed to create a **learning loop**.
+
+---
+
+## Features
+
+### Decision Journal
+
+Create structured decision records containing:
+
+- Decision title and context
+- Problem statement
+- Alternatives considered
+- Decision owner and confidence level
+- Assumptions and expected outcomes
+- Success metrics and review date
+
+### Decision Timeline
+
+View decisions chronologically instead of searching through old conversations and documents.
+
+```
+Decision → Assumptions → Expected Outcome → Actual Outcome → Learning
+```
+
+### Assumption Tracking
+
+Every important decision is based on assumptions. Decidr makes those assumptions explicit so they can later be evaluated.
+
+| | |
+|---|---|
+| **Assumption** | Users will prefer a free plan over a 14-day trial. |
+| **Expected** | Higher activation and increased product adoption. |
+| **Actual** | Activation increased, but paid conversion decreased. |
+| **Learning** | The assumption was partially correct. |
+
+### AI Decision Analysis
+
+Before committing a decision, Decidr can analyze the available context and surface:
+
+- Potential risks
+- Missing considerations
+- Blind spots
+- Contradictory assumptions
+- Suggested success metrics
+- Questions worth answering before proceeding
+
+AI is used as a **thinking partner**, not as the decision-maker.
+
+### Outcome Tracking
+
+A decision isn't complete when someone clicks "Decide." Decidr allows teams to record what actually happened and compare it against the original expectation.
+
+| Expected | Actual |
+|---|---|
+| 20% increase in activation | 14% increase |
+| 10% paid conversion | 7.8% |
+| 2-week implementation | 5 weeks |
+
+The difference between expectation and reality becomes useful data.
+
+### Decision Retrospectives
+
+When a decision reaches its review date, Decidr prompts the team to revisit it. A retrospective captures:
+
+- What happened?
+- What went well? What went wrong?
+- Which assumptions were correct? Which failed?
+- Would we make the same decision again?
+- What should we do differently next time?
+
+### Decision Intelligence
+
+Over time, individual decisions become a dataset. Decidr can identify patterns such as:
+
+- *Engineering estimates are consistently more optimistic than actual delivery times.*
+- *Decisions made with low confidence have a higher rate of reversal.*
+- *Customer research appears more frequently in successful product decisions.*
+
+The long-term vision is to help teams understand **how** they make decisions, not just **what** they decided.
+
+---
+
+## Architecture
+
+```
+                         ┌─────────────────────┐
+                         │        User         │
+                         └──────────┬──────────┘
+                                    │
+                                    ▼
+                         ┌─────────────────────┐
+                         │     Next.js Web     │
+                         │      Frontend       │
+                         └──────────┬──────────┘
+                                    │ HTTP / JSON
+                                    ▼
+                         ┌─────────────────────┐
+                         │    Decidr API       │
+                         │      Backend        │
+                         └──────────┬──────────┘
+                                    │
+                 ┌──────────────────┼──────────────────┐
+                 │                  │                  │
+                 ▼                  ▼                  ▼
+        ┌────────────────┐ ┌────────────────┐ ┌────────────────┐
+        │   PostgreSQL   │ │   AI Provider  │ │    Analytics   │
+        │ Any PostgreSQL │ │ OpenAI/Gemini/ │ │   (Optional)   │
+        │   deployment   │ │ Anthropic/etc. │ │                │
+        └────────────────┘ └────────────────┘ └────────────────┘
+```
+
+**Architectural Principle:** Decidr does not depend on a Backend-as-a-Service database. The frontend never communicates with the database directly — all access goes through the Decidr backend.
+
+```
+Frontend → (HTTP) → Backend → (SQL/ORM) → PostgreSQL
+```
+
+This separation provides a clear security boundary, centralized business logic, database independence, easier testing, and less coupling to any particular cloud provider.
+
+---
+
+## Technology Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js |
+| Frontend Language | TypeScript |
+| Styling | Tailwind CSS |
+| UI Components | shadcn/ui |
+| Backend | Node.js + TypeScript |
+| API | REST |
+| Database | PostgreSQL |
+| Database Development | pgAdmin |
+| Authentication | Backend-managed |
+| AI | Provider abstraction |
+| Frontend Deployment | Vercel or equivalent |
+| Backend Deployment | Any Node.js-compatible host |
+| Database Hosting | Any PostgreSQL-compatible provider |
+
+---
+
+## Project Structure
+
+```
+decidr/
+│
+├── apps/
+│   ├── web/
+│   │   ├── app/
+│   │   ├── components/
+│   │   ├── features/
+│   │   ├── hooks/
+│   │   ├── lib/
+│   │   ├── types/
+│   │   └── public/
+│   │
+│   └── api/
+│       ├── src/
+│       │   ├── config/
+│       │   ├── database/
+│       │   ├── middleware/
+│       │   ├── modules/
+│       │   ├── routes/
+│       │   ├── services/
+│       │   ├── shared/
+│       │   └── main.ts
+│       └── tests/
+│
+├── database/
+│   ├── migrations/
+│   ├── seeds/
+│   └── scripts/
+│
+├── packages/
+│   ├── types/
+│   ├── ui/
+│   └── config/
+│
+├── docs/
+│   ├── architecture/
+│   ├── development/
+│   └── product/
+│
+├── .env.example
+├── CONTRIBUTING.md
+├── SECURITY.md
+├── LICENSE
+└── README.md
 ```
 
 ---
 
-## Key Features
+## Feature Isolation
 
-### 1. Structured Decision Journaling
-Capture decision records with rich metadata: problem statements, options evaluated, chosen alternative, rationale, drivers, approvers, and confidence ratings ($1-100\%$).
+One of Decidr's core engineering principles: **a failure in one feature should not bring down the entire product.**
 
-### 2. Interactive Decision Timeline
-Filter and visualize decisions across team workspaces by domain, owner, urgency, or status (Proposed, Decided, Under Review, Superseded).
+Features are organized as independent vertical slices:
 
-### 3. Bring-Your-Own-AI (BYO-AI) Analysis
-Connect OpenAI, Anthropic, or local Ollama instances to run automated risk assessments, identify logical fallacies, test underlying assumptions, and highlight potential blind spots before finalizing a decision.
+```
+modules/
+│
+├── auth/
+│   ├── auth.controller.ts
+│   ├── auth.service.ts
+│   ├── auth.repository.ts
+│   ├── auth.schema.ts
+│   └── auth.routes.ts
+│
+├── decisions/
+│   ├── decision.controller.ts
+│   ├── decision.service.ts
+│   ├── decision.repository.ts
+│   ├── decision.schema.ts
+│   └── decision.routes.ts
+│
+├── assumptions/
+├── outcomes/
+└── ai/
+    ├── ai.controller.ts
+    ├── ai.service.ts
+    ├── providers/
+    └── schemas/
+```
 
-### 4. Assumption & Outcome Tracking
-Link concrete assumptions to every decision and attach expected success metrics. Set automated review dates to compare projected outcomes against reality.
+Each feature owns its routes, validation, business logic, database access, tests, and feature-specific types. Shared functionality belongs in explicitly shared modules.
 
-### 5. Structured Retrospectives
-Conduct post-decision retrospectives to evaluate *decision quality* independently from *outcome quality*, fostering a blameless, learning-driven team culture.
+**Frontend features follow the same principle:**
 
-### 6. Decision Pattern & Bias Detection
-Aggregate analytics identify recurring team patterns, systematic over-confidence, cognitive biases, or recurring technical debt drivers.
-
-### 7. Enterprise-Grade Workspace Isolation
-Multi-tenant logical workspace isolation ensuring strict data security and role-based access control (RBAC).
+```
+features/decisions/
+├── components/
+│   ├── decision-form.tsx
+│   ├── decision-card.tsx
+│   └── decision-timeline.tsx
+├── hooks/
+│   └── use-decisions.ts
+├── api/
+│   └── decisions-api.ts
+└── types.ts
+```
 
 ---
 
-## System Architecture
+## Database Architecture
 
-Decidr is designed around the **4 Primary Colors of Computer Science** (Compute, Memory, Storage, Network) and guided by strict software reliability principles for maximum predictability and minimal operational overhead.
+PostgreSQL is a first-class part of Decidr — not hidden behind a BaaS abstraction.
 
 ```
-                  ┌──────────────────────────────────────────┐
-                  │          NETWORK: Edge Reverse Proxy     │
-                  │   (Caddy/NGINX - TLS 1.3, Rate Limits)   │
-                  └─────────────────────┬────────────────────┘
-                                        │
-             ┌──────────────────────────┴──────────────────────────┐
-             ▼                                                     ▼
-┌───────────────────────────┐                       ┌────────────────────────────┐
-│      COMPUTE: Web API     │                       │  COMPUTE: Async Workers    │
-│  (Node.js App Nodes)      │                       │  (BullMQ Event Processors) │
-└────────────┬──────────────┘                       └──────────────┬─────────────┘
-             │                                                     │
-             ├──────────────────────────┬──────────────────────────┤
-             ▼                          ▼                          ▼
-┌───────────────────────────┐┌───────────────────────────┐┌───────────────────────────┐
-│       MEMORY: Cache       ││     STORAGE: Relational   ││     STORAGE: Object Store │
-│ (Redis L2 + In-Process L1)││ (PostgreSQL + JSONB Engine││   (MinIO / S3 - Attachments)│
-└───────────────────────────┘└───────────────────────────┘└───────────────────────────┘
+users
+  └── workspace_members
+             └── workspaces
+                      └── decisions
+                               ├── assumptions
+                               ├── alternatives
+                               ├── metrics
+                               └── reviews
+                                       └── outcomes
 ```
 
-### Resource Allocation Matrix
+**Database Principles:**
 
-| Dimension | Technology | Role \& Rationale |
-| :--- | :--- | :--- |
-| **Compute** | Next.js Standalone + BullMQ | Stateless UI/API nodes for instant response; isolated worker processes for background AI analysis. |
-| **Memory** | Redis + In-Memory LRU | Ephemeral caching for sessions, rate limits, job queues, and hot lookup tables. |
-| **Storage** | PostgreSQL (JSONB) + MinIO | Relational integrity for decision trees + JSONB for evolving AI schema attributes + object store for attachments. |
-| **Network** | Caddy / NGINX | TLS 1.3 edge termination, reverse proxy isolation, and outbound AI request proxying. |
+- PostgreSQL is the source of truth
+- Schema changes are version-controlled
+- Migrations are committed to the repository
+- Foreign keys enforce relationships
+- Transactions are used where multiple writes must succeed or fail together
+- Business-critical authorization is enforced by the backend and database design
 
 ---
 
-## Tech Stack
+## PostgreSQL Anywhere
 
-- **Framework:** [Next.js](https://nextjs.org/) (App Router, React 19, Server Actions)
-- **Language:** [TypeScript](https://www.typescriptlang.org/) (Strict Mode)
-- **Styling & UI:** [Tailwind CSS](https://tailwindcss.com/) + [Shadcn UI](https://ui.shadcn.com/)
-- **Database & ORM:** [PostgreSQL](https://www.postgresql.org/) + [Prisma ORM](https://www.prisma.io/)
-- **Queues & Caching:** [Redis](https://redis.io/) + [BullMQ](https://docs.bullmq.io/)
-- **AI Integration:** [Vercel AI SDK](https://sdk.vercel.ai/docs) (Supporting OpenAI, Anthropic, Ollama)
-- **Validation:** [Zod](https://zod.dev/) runtime schema checking
-- **Packaging:** Docker & Docker Compose
+Decidr works with any standard PostgreSQL connection. The application only needs a connection string — where PostgreSQL runs is an infrastructure decision, not an application dependency.
+
+Supported providers include: Local PostgreSQL, AWS RDS, Azure Database for PostgreSQL, Google Cloud SQL, Render, Neon, Supabase, and any standard PostgreSQL host.
 
 ---
 
-## Quick Start & Self-Hosting
+## Local Database Development
 
-The fastest way to get Decidr running is via Docker Compose.
+Development does not require a cloud database. Install PostgreSQL locally and manage it with pgAdmin.
 
-### Prerequisites
-- Docker Engine $\ge 24.0$
-- Docker Compose $\ge v2.20$
-
-### 1. Clone the Repository
-```bash
-git clone https://github.com/yeswadams/your-org/decidr.git
-cd decidr
+```
+┌──────────────────────┐
+│      Decidr API      │
+└──────────┬───────────┘
+           │ PostgreSQL
+           ▼
+┌──────────────────────┐
+│  Local PostgreSQL    │
+│  Database: decidr    │
+│  Port: 5432          │
+└──────────┬───────────┘
+           ▼
+       ┌────────┐
+       │pgAdmin │
+       └────────┘
 ```
 
-### 2. Configure Environment Variables
-Copy the sample environment file:
+The goal is not to make PostgreSQL disappear — the goal is to make PostgreSQL **understandable**.
+
+---
+
+## Authentication and Authorization
+
+Authentication and authorization are separate concerns:
+
+```
+Authentication → Who are you?
+Authorization  → What are you allowed to access?
+```
+
+The backend owns all authentication-sensitive logic. The authenticated identity is derived from the session/token server-side — never from a user-provided `user_id` in the request body. This prevents users from simply changing an ID and accessing another user's data.
+
+---
+
+## AI Architecture
+
+AI functionality is isolated behind an application-level abstraction:
+
+```
+Component
+    ↓
+Decision Intelligence Service
+    ↓
+AI Provider Interface
+    ├── OpenAI
+    ├── Gemini
+    ├── Anthropic
+    └── Other providers
+```
+
+The application does not need to know which model generated the analysis. This makes it possible to change providers, support multiple providers, add local models, and allow self-hosted installations to choose their own provider.
+
+AI output should be treated as **advisory** — it may be incorrect, incomplete, or based on insufficient context. Users remain responsible for evaluating AI-generated insights.
+
+---
+
+## Environment Variables
+
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` to set your secret keys and database passwords:
 ```env
-# Core Application
-PORT=3000
-NEXTAUTH_SECRET=change-this-to-a-secure-random-secret
-NEXTAUTH_URL=http://localhost:3000
+# Application
+NODE_ENV=development
+PORT=4000
+APP_URL=http://localhost:4000
+WEB_URL=http://localhost:3000
 
-# Database & Redis
-DATABASE_URL=postgresql://decidr:decidr_secret@postgres:5432/decidr?schema=public
-REDIS_URL=redis://redis:6379
+# PostgreSQL
+DATABASE_URL=postgresql://username:password@localhost:5432/decidr
 
-# BYO-AI Provider Configuration
-AI_PROVIDER=openai # Options: openai | anthropic | ollama
-OPENAI_API_KEY=sk-proj-your-key-here
-# OLLAMA_BASE_URL=http://host.docker.internal:11434 # Un-comment for local AI
+# Authentication
+AUTH_SECRET=
+
+# AI
+AI_PROVIDER=
+AI_API_KEY=
+
+# Analytics
+ANALYTICS_ENABLED=false
 ```
 
-### 3. Launch the Stack
-```bash
-docker compose up -d
-```
-
-### 4. Access Decidr
-Open your browser and navigate to:
-```
-http://localhost:3000
-```
-Follow the on-screen setup wizard to create your primary administrator account and initial workspace.
+> **Never commit** `.env`, API keys, database passwords, authentication secrets, or production credentials. Commit `.env.example` with safe placeholder values only.
 
 ---
 
-## Configuration & BYO-AI
-
-Decidr is designed around a **Bring-Your-Own-AI (BYO-AI)** model, putting you in control of cost, privacy, and performance.
-
-### Supported AI Providers
-
-#### 1. OpenAI
-```env
-AI_PROVIDER=openai
-OPENAI_API_KEY=sk-your-openai-key
-AI_MODEL=gpt-4o-mini
-```
-
-#### 2. Anthropic
-```env
-AI_PROVIDER=anthropic
-ANTHROPIC_API_KEY=sk-ant-your-key
-AI_MODEL=claude-3-5-sonnet-20241022
-```
-
-#### 3. Local Ollama (100% Air-Gapped / Private)
-Run local LLMs with zero external network transmission:
-```env
-AI_PROVIDER=ollama
-OLLAMA_BASE_URL=http://localhost:11434
-AI_MODEL=llama3.1:8b
-```
-
----
-
-## Development Setup
-
-If you wish to contribute to Decidr or build custom integrations locally:
+## Getting Started
 
 ### Prerequisites
-- Node.js $\ge 20.0.0$
-- pnpm $\ge 9.0.0$
-- Local PostgreSQL and Redis instances (or run `docker compose up postgres redis -d`)
 
-### Local Setup Instructions
+- Node.js 20+
+- npm or another supported package manager
+- PostgreSQL 16+ (recommended)
+- pgAdmin 4 (recommended for database administration)
+- Git
+- An AI provider account (if AI features are enabled)
 
-1. **Install Dependencies:**
-   ```bash
-   pnpm install
-   ```
+### 1. Clone the repository
 
-2. **Run Database Migrations & Generate Prisma Client:**
-   ```bash
-   pnpm prisma migrate dev
-   pnpm prisma generate
-   ```
+```bash
+git clone https://github.com/YOUR_USERNAME/decidr.git
+cd decidr
+```
 
-3. **Seed Development Database (Optional):**
-   ```bash
-   pnpm db:seed
-   ```
+### 2. Install dependencies
 
-4. **Start the Development Server:**
-   ```bash
-   pnpm dev
-   ```
-   The application will start on `http://localhost:3000`.
+```bash
+npm install
+```
 
-5. **Run Test Suite:**
-   ```bash
-   pnpm test         # Unit & Integration Tests
-   pnpm test:e2e     # Playwright E2E Tests
-   pnpm lint         # Typecheck & ESLint
-   ```
+### 3. Create a PostgreSQL database
+
+```sql
+CREATE DATABASE decidr;
+
+CREATE USER decidr_dev WITH PASSWORD 'change_this_password';
+
+GRANT ALL PRIVILEGES ON DATABASE decidr TO decidr_dev;
+```
+
+### 4. Configure environment variables
+
+```bash
+cp .env.example .env
+```
+
+Set your PostgreSQL connection string:
+
+```env
+DATABASE_URL=postgresql://decidr_dev:change_this_password@localhost:5432/decidr
+```
+
+### 5. Run database migrations
+
+```bash
+npm run db:migrate
+```
+
+### 6. Seed development data
+
+```bash
+npm run db:seed
+```
+
+> Seed data is for development only. Never seed production with example credentials.
+
+### 7. Start the backend
+
+```bash
+npm run dev:api
+```
+
+### 8. Start the frontend
+
+```bash
+npm run dev:web
+```
+
+Open [http://localhost:3000](http://localhost:3000).
 
 ---
 
-## Project Roadmap
+## Development Workflow
 
-- [x] Core Decision Journaling & Context Capture
-- [x] Multi-tenant Workspace Infrastructure
-- [x] BYO-AI Provider Integration (OpenAI, Anthropic, Ollama)
-- [x] Assumption & Outcome Tracking Engine
-- [ ] Slack & Microsoft Teams Webhook Integrations
-- [ ] Custom Architectural Decision Record (ADR) Export Formats (Markdown, PDF)
-- [ ] Vector Memory (pgvector) for Semantic Decision Search
-- [ ] Automated Bias Identification in Retrospectives
+```bash
+git checkout -b feat/decision-retrospectives
+
+# make changes, then:
+git add .
+git commit -m "feat: add decision retrospective workflow"
+git push origin feat/decision-retrospectives
+```
+
+**Commit conventions:**
+
+| Prefix | Usage |
+|---|---|
+| `feat:` | New feature |
+| `fix:` | Bug fix |
+| `docs:` | Documentation changes |
+| `test:` | Adding or updating tests |
+| `refactor:` | Code refactoring |
+| `chore:` | Dependency updates, tooling |
+
+---
+
+## Testing
+
+Tests should exist at three levels:
+
+| Level | What it tests |
+|---|---|
+| Unit tests | Isolated business logic (validation, calculations, AI response parsing) |
+| API tests | Authentication, authorization, request validation, HTTP responses |
+| Integration tests | Interactions between backend, PostgreSQL, auth, and external services |
+
+A feature is not complete because its happy path works. **Test failure paths too.**
+
+API errors should return predictable, structured responses:
+
+```json
+{
+  "error": {
+    "code": "DECISION_NOT_FOUND",
+    "message": "The requested decision could not be found."
+  }
+}
+```
+
+Never leak SQL errors, stack traces, internal file paths, secrets, or database credentials in responses.
 
 ---
 
 ## Contributing
 
-We actively welcome contributions from the open-source community! Whether you are interested in UX design, AI prompting, database optimization, backend engineering, or documentation, there are many ways to get involved.
+Contributions are welcome. You don't need to be an expert in every part of the stack. There are opportunities across:
 
-### How to Contribute
-1. **Explore Open Issues:** Check out our [Good First Issues](https://github.com/your-org/decidr/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22).
-2. **Submit a Proposal:** For major feature changes, please open a Discussion or Issue first to coordinate with maintainers.
-3. **Follow Coding Standards:**
-   - Strict TypeScript checks (`noImplicitAny`).
-   - Clean, modular functions under 60 lines where possible.
-   - High assertion density and explicit error handling.
-   - Comprehensive unit tests for new features.
+Product design · UX research · Frontend · Backend · PostgreSQL · AI engineering · Testing · Documentation · Accessibility · Developer experience
 
-Please review our [CONTRIBUTING.md](./CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md) before submitting pull requests.
+**Before contributing:**
+
+1. Read this README and `CONTRIBUTING.md`
+2. Check existing issues and pull requests
+3. Look for issues marked `good first issue` if you're new
+4. Open an issue before making a large architectural change
+5. Keep pull requests focused on one problem
+
+**A good pull request should:**
+
+- Explain what changed and why
+- Include screenshots for UI changes
+- Include tests where appropriate
+- Avoid unrelated refactoring
+- Update documentation when behavior changes
+- Include database migrations when the schema changes
+
+---
+
+## Reporting Bugs
+
+Open an issue and include:
+
+- What you expected to happen
+- What actually happened
+- Steps to reproduce
+- Browser / OS where relevant
+- Console or server errors
+- Screenshots where useful
+
+Remove API keys, passwords, tokens, and personal information before posting logs.
+
+---
+
+## Security
+
+Security issues should **not** be reported through public GitHub issues. Use the repository's configured private security reporting channel.
+
+Do not publicly disclose authentication bypasses, authorization bypasses, cross-user data access, SQL injection vulnerabilities, or any exposed credentials or sensitive user data.
+
+See `SECURITY.md` for the full security policy.
+
+---
+
+## Roadmap
+
+### Phase 1 — Decision Journal
+- [ ] User authentication
+- [ ] Create decisions
+- [ ] Capture decision context
+- [ ] Record alternatives and assumptions
+- [ ] Confidence scoring
+- [ ] Decision timeline
+- [ ] Search and filtering
+
+### Phase 2 — Decision Review
+- [ ] Review dates
+- [ ] Outcome tracking
+- [ ] Expected vs actual outcomes
+- [ ] Retrospectives
+- [ ] Decision effectiveness scoring
+
+### Phase 3 — Decision Intelligence
+- [ ] AI blind-spot detection
+- [ ] AI decision analysis
+- [ ] Pattern detection
+- [ ] Decision trend analysis
+- [ ] Team-level insights
+
+### Phase 4 — Collaboration
+- [ ] Team workspaces
+- [ ] Decision ownership
+- [ ] Comments and participants
+- [ ] Decision sharing
+- [ ] Notifications
+
+### Phase 5 — Integrations
+Slack · Linear · Jira · GitHub · Notion · Microsoft Teams
+
+The roadmap is intentionally flexible. Community feedback influences what gets built next.
+
+---
+
+## Self-Hosting
+
+One of Decidr's core goals is to make decision intelligence available without requiring organizations to surrender control of their data.
+
+A self-hosted installation gives you control over:
+
+- Application hosting
+- PostgreSQL database
+- Authentication configuration
+- AI provider
+- Analytics configuration
+- Data retention and backups
+
+**Deployment options:**
+
+| Layer | Options |
+|---|---|
+| Frontend | Vercel, Netlify, Cloudflare, self-hosted |
+| Backend | Render, Railway, Fly.io, AWS, Azure, GCP, VPS, Kubernetes |
+| PostgreSQL | Local, AWS RDS, Azure Database, Google Cloud SQL, Render, Neon, Supabase, self-hosted |
+
+These are infrastructure options, not application dependencies. The PostgreSQL provider can be changed without changing the application's data model.
+
+---
+
+## Design Philosophy
+
+Decidr should feel like a place where people **think**, not another corporate dashboard.
+
+The interface prioritizes clarity, context, calmness, progressive disclosure, readability, fast workflows, and meaningful information density. A decision should be understandable without opening ten different screens. Good decision hygiene should be easier to practice consistently — not turned into bureaucracy.
+
+---
+
+## Decision Framework
+
+The underlying Decidr framework:
+
+| # | Question |
+|---|---|
+| 1 | What problem are we solving? |
+| 2 | What context do we have? |
+| 3 | What alternatives did we consider? |
+| 4 | What are we assuming? |
+| 5 | What did we decide? |
+| 6 | How confident are we? |
+| 7 | What do we expect to happen? |
+| 8 | How will we measure success? |
+| 9 | When should we review it? |
+| 10 | What actually happened? |
+| 11 | What did we learn? |
+| 12 | Would we make the same decision again? |
+
+---
+
+## Open Source Philosophy
+
+Decidr is open source because organizational memory should not have to live inside a proprietary system.
+
+The project aims to give teams control over their code, data, database, infrastructure, and AI provider. That means:
+
+- PostgreSQL remains a standard PostgreSQL database
+- Migrations are version-controlled
+- Infrastructure is replaceable
+- AI providers are abstracted
+- Documentation is part of the product
+- Contributors can understand the system without access to a private environment
+
+---
+
+## Project Status
+
+**Early-stage / Active Development**
+
+Decidr is currently being developed as an open-source project and hackathon submission. The API, database schema, UI, architecture, and feature set may change significantly while the project matures. Expect breaking changes during early development.
 
 ---
 
 ## License
 
-Decidr is open-source software licensed under the **[GNU Affero General Public License v3.0 (AGPL-3.0)](./LICENSE)**.
+Decidr is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
 
-Under this license, you are free to inspect, modify, and self-host Decidr. Any network-accessible derivative works or enhancements must also be open-sourced under the AGPL-3.0 license.
+You are free to use, study, modify, self-host, distribute, and contribute improvements to Decidr. See `LICENSE` for the complete license text.
 
 ---
 
-<p center>
-  Built with ❤️ for teams that value clear thinking and organizational memory.
-</p>
+*Built with curiosity.*
+
+**Decidr — Remember why. Learn what worked. Decide better.**
