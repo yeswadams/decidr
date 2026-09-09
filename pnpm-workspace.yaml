@@ -1,0 +1,3 @@
+packages:
+  - 'apps/*'      # For your main applications (like website, backend API)
+  - 'packages/*'  # For shared tools or UI libraries
