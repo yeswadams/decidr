@@ -1,0 +1,3 @@
+$ echo "Error: no test specified" && exit 1
+Terminate batch job (Y/N)? 
+^C

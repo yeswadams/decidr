@@ -1,10 +1,21 @@
 {
   "name": "decidr",
   "version": "1.0.0",
+  "private": true,
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "commit": "cz",
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "test": "turbo test",
+    "test:e2e": "turbo test:e2e",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "clean": "turbo clean",
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +27,28 @@
       "onFail": "download"
     }
   },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix"
+    ],
+    "*.{json,md,yml,yaml,css}": [
+      "prettier --write"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
   "packageManager": "pnpm@12.3.4",
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "@commitlint/cli": "^21.2.2",
+    "@commitlint/config-conventional": "^21.2.2",
+    "commitizen": "^4.3.2",
+    "cz-conventional-changelog": "^3.3.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.5.0",
+    "turbo": "^2.10.12"
+  }
 }

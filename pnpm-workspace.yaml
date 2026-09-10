@@ -1,3 +1,8 @@
 packages:
   - 'apps/*'      # For your main applications (like website, backend API)
   - 'packages/*'  # For shared tools or UI libraries
+allowBuilds:
+  esbuild: false
+  msgpackr-extract: true
+  unrs-resolver: false
+  workerd: true
