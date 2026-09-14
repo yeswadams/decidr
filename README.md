@@ -147,6 +147,7 @@ Before committing a decision, Decidr can analyze the available context and surfa
 - Contradictory assumptions
 - Suggested success metrics
 - Questions worth answering before proceeding
+- A log
 
 AI is used as a **thinking partner**, not as the decision-maker.
 
