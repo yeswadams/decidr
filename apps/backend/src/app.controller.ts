@@ -38,6 +38,10 @@ connection pool, singleton services with global state, are all shared accross in
 
   - this yields: GET /user?role=admin&department=engineering
 
+// Registering the controller
+- every controller must belong to a module. so I need you to comeup
+- @Module({controllers: [UserController]})
+
 */
 
 import { Controller, Get } from '@nestjs/common';
