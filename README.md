@@ -486,7 +486,7 @@ ANALYTICS_ENABLED=false
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/decidr.git
+git clone https://github.com/yeswadams/decidr.git
 cd decidr
 ```
 
