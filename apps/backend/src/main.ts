@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule, ObserveInstrument } from './app.module.js';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { LoggerMiddleware } from './logger.middleware.js';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -9,6 +10,7 @@ async function bootstrap() {
   }
 );
   app.set("query parser", "extended");  // HTTP adapter to use extended parser for complex queries
+  app.use(LoggerMiddleware); // bind the middleware to every registered routes at once, using the use() method
   await app.listen(process.env.PORT ?? 4000);
 }
 await bootstrap();

@@ -10,7 +10,7 @@ cmd - nest g service name
 - constructor(private userService: CatsService) {}
 
 // Optional providers
-- config object
+- config object: @Optional()
 */
 
 import { Injectable } from '@nestjs/common';
